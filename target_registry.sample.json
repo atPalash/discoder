@@ -1,0 +1,46 @@
+{
+  "_comment": [
+    "Sample Target_Registry for the Discord-Ollama Coding Agent.",
+    "This is the persisted, machine-writable store of Registered_Targets; it survives container restarts.",
+    "Copy this file to e.g. target_registry.json and edit it for your targets.",
+    "Each target needs: a unique name (1..64 non-whitespace Unicode chars), a directory_path that resolves",
+    "INSIDE the configured workspace_dir, and a non-empty repo_remote. Targets missing any of these are",
+    "excluded at startup with a logged reason (but startup still proceeds).",
+    "build_command is optional (a target with none skips the build step).",
+    "default_branch is synced from the remote before each Job (default 'main').",
+    "branch_scheme is a naming template; the default '{job_id}' already includes the target name because",
+    "the Job id is '{target_name}-{unique_suffix}'.",
+    "credentials_ref is a REFERENCE to the Git credentials (an environment-variable name or a secret path),",
+    "NEVER the secret value itself. The secret is resolved at push time and is never persisted or logged.",
+    "The agent appends admin-added targets to the real registry file automatically; the '_comment' key",
+    "above is ignored by the loader and is only here for documentation."
+  ],
+  "targets": [
+    {
+      "name": "sample-backend",
+      "directory_path": "/workspace/sample-backend",
+      "build_command": "pytest -q",
+      "repo_remote": "https://github.com/your-org/sample-backend.git",
+      "default_branch": "main",
+      "branch_scheme": "{job_id}",
+      "credentials_ref": "GIT_TOKEN_SAMPLE_BACKEND"
+    },
+    {
+      "name": "sample-frontend",
+      "directory_path": "/workspace/sample-frontend",
+      "build_command": "npm install && npm run build",
+      "repo_remote": "https://github.com/your-org/sample-frontend.git",
+      "default_branch": "develop",
+      "branch_scheme": "agent/{job_id}",
+      "credentials_ref": "GIT_TOKEN_SAMPLE_FRONTEND"
+    },
+    {
+      "name": "sample-empty-project",
+      "directory_path": "/workspace/sample-empty-project",
+      "repo_remote": "git@github.com:your-org/sample-empty-project.git",
+      "default_branch": "main",
+      "branch_scheme": "{job_id}",
+      "credentials_ref": "/run/secrets/git_ssh_key_sample"
+    }
+  ]
+}

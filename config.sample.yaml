@@ -1,0 +1,84 @@
+# =============================================================================
+# Discord-Ollama Coding Agent - Sample System Configuration
+# =============================================================================
+#
+# This is the global, operator-authored system configuration the agent reads at
+# startup (SystemConfig). It is loaded as YAML and validated fail-fast: any
+# missing required value or out-of-bounds value terminates startup with an error
+# identifying the offending value.
+#
+# Only the Ollama endpoint/model are global across all targets. Every per-target
+# setting (build command, Git remote, branch scheme, credentials) lives in the
+# Target_Registry JSON file (see target_registry.sample.json), NOT here.
+#
+# Copy this file to `config.yaml`, fill in your own values, and point the agent
+# at it. All sample values below are within the documented validation bounds.
+# -----------------------------------------------------------------------------
+
+# Global Ollama server settings (the only target-independent settings).
+ollama:
+  # The Ollama server URL. Must be a syntactically valid http or https URL.
+  endpoint_url: "http://localhost:11434"
+  # The model name to generate with. Must contain a non-whitespace character.
+  model: "qwen2.5-coder:7b"
+  # Per-request generation timeout, in seconds. Integer in [30, 600].
+  # Default: 120.
+  generation_timeout_s: 120
+
+# Parent folder under which all valid target directories must reside. This is
+# the containment boundary used by the Target_Registry: every Registered_Target's
+# directory_path must resolve inside this directory.
+workspace_dir: "/workspace"
+
+# Maximum generate-and-build attempts per Job before recording a
+# max-attempts-exhausted failure. Integer in [1, 10]. Default: 3.
+max_build_attempts: 3
+
+# Maximum number of concurrently Running Jobs. Integer in [1, 100].
+concurrency_limit: 4
+
+# Maximum runtime for a single build/test command, in seconds.
+# Integer in [1, 3600]. Default: 300.
+execution_timeout_s: 300
+
+# Bounds on the existing-project context handed to the model so a generation
+# request stays within the model's context window.
+context_budget:
+  # Maximum number of existing files included as context. Integer in [1, 1000].
+  max_file_count: 50
+  # Maximum combined size of context files, in bytes.
+  # Integer in [1024, 67108864] (1 KiB .. 64 MiB).
+  max_total_bytes: 1048576  # 1 MiB
+
+# Discord channel identifiers in which commands are accepted and responses are
+# posted. Must be non-empty. Commands from any other channel are not acted upon.
+allowed_channels:
+  - 111111111111111111
+  - 222222222222222222
+
+# Discord user identifiers permitted to run /build, /status, /cancel, /targets,
+# and /revise.
+authorized_users:
+  - 333333333333333333
+  - 444444444444444444
+
+# Discord user identifiers permitted to run /addtarget (registering new targets).
+# This is a separate, additional privilege independent of authorized_users.
+admin_users:
+  - 333333333333333333
+
+# Registered_Target used by /build when no target name is supplied. Must name a
+# target present in the Target_Registry. Optional: omit it to require an explicit
+# target on every /build.
+default_target: "sample-backend"
+
+# Optional cap on idea length, measured in Unicode characters. When set it must
+# be a positive integer. Omit for no cap.
+max_idea_length: 2000
+
+# Maximum time allowed for a Git push, in seconds. Integer in [1, 3600].
+# Default: 120.
+push_timeout_s: 120
+
+# Maximum captured build/test output, in bytes. Integer >= 1. Default: 1 MiB.
+build_output_cap_bytes: 1048576  # 1 MiB
